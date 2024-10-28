@@ -1,0 +1,83 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from rdkit import Chem
+from rdkit import RDLogger
+RDLogger.DisableLog('rdApp.*')
+from rdkit.Chem import rdFingerprintGenerator
+from sklearn.neural_network import MLPClassifier
+from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
+from xgboost import XGBClassifier
+from sklearn.metrics import accuracy_score, precision_score, recall_score
+from rdkit import DataStructs
+from sklearn.datasets import load_wine
+from sklearn.model_selection import train_test_split
+
+data = pd.read_csv('initial.csv')
+df = pd.DataFrame(data)
+print(df)
+
+def generate_fingerprints(df, column_name,fp_type, fp_size):
+    if fp_type == 'morgan':
+        fp_gen = rdFingerprintGenerator.GetMorganGenerator(radius=3, fpSize=fp_size)
+    elif fp_type == 'rdkit':
+        fp_gen = rdFingerprintGenerator.GetRDKitFPGenerator(fpSize=fp_size)
+    elif fp_type == 'atom_pair':
+        fp_gen = rdFingerprintGenerator.GetAtomPairGenerator(fpSize=fp_size)
+    elif fp_type == 'topological_torsion':
+        fp_gen = rdFingerprintGenerator.GetTopologicalTorsionGenerator(fpSize=fp_size)
+    fps = []
+    smiles = []
+    for smile in df[column_name]:
+        smiles.append(smile)
+        mol = Chem.MolFromSmiles(smile)
+        if mol is not None:
+            fp = fp_gen.GetFingerprint(mol)
+            arr = np.zeros((0,), dtype=int)
+            DataStructs.ConvertToNumpyArray(fp, arr)
+            fps.append(arr)
+        else:
+            continue
+    return np.array(fps), smiles
+df['fingerprints'] = list(fps)
+X_train, X_test, y_train, y_test = train_test_split(df['fingerprints'].to_list(), df['score'], test_size=0.3, random_state=42)
+
+
+def train_and_evaluate(fp_type, fp_size, train_data, test_data):
+    X_train = generate_fingerprints(train_data, fp_type, fp_size)
+    X_test = generate_fingerprints(test_data, fp_type, fp_size)
+    y_train = train_data['Y'].values
+    y_test = test_data['Y'].values
+
+    classifiers = {
+        'MLP': MLPClassifier(max_iter=1000),
+        'SVC': SVC(),
+        'Random Forest': RandomForestClassifier(),
+        'XGBoost': XGBClassifier()}
+
+    results = {}
+    for name, clf in classifiers.items():
+        clf.fit(X_train, y_train)
+        predictions = clf.predict(X_test)
+        results[name] = {
+            'accuracy': accuracy_score(y_test, predictions),
+            'precision': precision_score(y_test, predictions),
+            'recall': recall_score(y_test, predictions)}
+    return results
+        
+def find_best_model(results_dict, accuracy_weight, precision_weight, recall_weight):
+    best_score = -1
+    best_combination = None
+
+    for key, results in results_dict.items():
+        for classifier, metrics in results.items():
+            weighted_score = (metrics['accuracy'] * accuracy_weight +
+                                metrics['precision'] * precision_weight +
+                                metrics['recall'] * recall_weight)
+
+            if weighted_score > best_score:
+                best_score = weighted_score
+                best_combination = (classifier, key, weighted_score)
+
+    return best_combination
