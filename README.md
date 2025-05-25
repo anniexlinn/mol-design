@@ -4,17 +4,43 @@
 ## **Project Description**  
 **Mol-Design automates the discovery of novel drug candidates** by combining AI and evolutionary algorithms. It generates chemically viable molecules with predicted high activity against biological targets, significantly accelerating early-stage drug discovery.  
 
-**Key Innovations**:  
-- **Hybrid ML-evolutionary approach  
-- **SELFIES-based robust molecular representation  
-- **Tournament selection for efficient optimization  
+**Innovations**:  
+- Hybrid ML-evolutionary approach  
+- SELFIES-based robust molecular representation  
+- Tournament selection for efficient optimization
 
 
-This project seeks to implement the design of highly active molecules for pharmaceutical applications using machine and deep learning techniques. Various methods use a combination of molecular generation, mutation, and evolutionary algorithms to generate diverse molecules. To meet the primary objective of designing novel molecules that score high in a given dataset of pharmaceutical-related compounds, optimization for molecular structures with desired activity is employed. The workflow involves data processing, model training, and evolutionary design to iteratively improve molecular designs.
-The first step in this approach involves processing the initial dataset, which is comprised of SMILES representations and corresponding scores. The SMILES strings are converted to RDKit 2D descriptors using the MolConvert module. To predict the activity of molecules, various machine learning models such as RandomForest, SVR, and XGBoost are used to serve as oracles for evaluating the activity of newly generated molecules. The dataset is split into training and testing sets to evaluate model performance and trained models are evaluated on the testing set to assess their predictive accuracy based on metrics such as mean absolute error and R-squared.
+## Overview  
+An end-to-end pipeline for designing novel pharmaceutical molecules using:  
+- **Molecular generation** (SMILES/SELFIES)  
+- **Machine learning oracles** (RandomForest, XGBoost, SVR) for activity prediction  
+- **Evolutionary algorithms** with mutation and selection  
+- **Automated optimization** of activity scores  
 
-For the molecular generation step, SELFIES are used for encoding the molecular structure. Molecules are initially generated randomly or selected from existing datasets, which allows for diversity that’s crucial for subsequent optimization processes. The OracleStorage class is then implemented to manage Oracle calls, sort evaluated molecules, and save the results. Methods such as sort_buffer sort evaluated molecules based on scores to identify top-performing molecules efficiently, max_oracle_calls ensure the budget is not exceeded, and mol_buffer stores molecules along with their associated scores and positions in evaluation order. Mutations are introduced to the generated molecules through operations such as insertion, replacement, and deletion of characters. To mutate a given SELFIE, a mutation probability parameter is introduced to the mutate_selfie_diverse function to control the probability of diversity-promoting mutations during the mutation process. By adjusting this probability, the frequency of insertion of random structures or replacement with random characters is controlled and further can be increased.
+**Key Features**:  
+✔️ RDKit-based descriptor calculation  
+✔️ Customizable mutation operators  
+✔️ Early stopping via convergence detection  
+✔️ Output of diverse, high-activity candidates  
 
-Subsequently, an evolutionary optimization algorithm operates in generations, where the best-performing molecule is retained and the rest are mutated to create a new population. In each generation, the activity of each molecule in the population is evaluated using the RandomForestRegressor oracle. A tournament selection mechanism is employed to favor the fittest molecules. This involves randomly selecting a subset of molecules (comprising a tournament) from the population and choosing the winner that has the highest fitness. After selecting the winner from each tournament, a mutation process is applied to generate diverse candidate molecules. The mutated molecules along with the best molecule from the previous generation form the new population for the next generation. The tournament selection for reproduction helps determine which molecules will contribute to the next generation and favors molecules with higher scores. This mechanism encourages the propagation of favorable traits
+---
 
-over successive generations and the retention of beneficial features. Convergence criteria are utilized to determine when to terminate the process, which happens when newly generated molecules don’t exhibit significant improvement over multiple generations, in which the algorithm terminates early to prevent unnecessary computation. The mean activity of the top 30 molecules is then calculated from the sorted buffer and the SMILES representations of the top 100 molecules are written in the txt file. A data frame of the top 30 molecules and their respective scores is displayed and the final weighted mean activity score for the top 30 molecules as well as the diversity of the molecules is calculated.
+## 🔧 Installation  
+
+### Prerequisites  
+- Python 3.8+  
+- RDKit (requires conda)  
+
+### Steps  
+```bash
+git clone https://github.com/yourusername/mol-design.git
+cd mol-design
+
+# Set up environment (conda recommended)
+conda create -n moldesign python=3.8 -y
+conda activate moldesign
+conda install -c conda-forge rdkit -y
+
+# Install remaining dependencies
+pip install -r requirements.txt
+
