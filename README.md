@@ -1,5 +1,14 @@
-# mol-design
-Implement machine and deep learning concepts, molecular generation, and evolutionary optimization algorithms to design highly active pharmaceutical molecules
+# Mol-Design: AI-Driven Pharmaceutical Molecule Generation  
+**Machine Learning + Evolutionary Optimization for Drug Discovery**  
+
+## **Project Description**  
+**Mol-Design automates the discovery of novel drug candidates** by combining AI and evolutionary algorithms. It generates chemically viable molecules with predicted high activity against biological targets, significantly accelerating early-stage drug discovery.  
+
+**Key Innovations**:  
+- **Hybrid ML-evolutionary approach  
+- **SELFIES-based robust molecular representation  
+- **Tournament selection for efficient optimization  
+
 
 This project seeks to implement the design of highly active molecules for pharmaceutical applications using machine and deep learning techniques. Various methods use a combination of molecular generation, mutation, and evolutionary algorithms to generate diverse molecules. To meet the primary objective of designing novel molecules that score high in a given dataset of pharmaceutical-related compounds, optimization for molecular structures with desired activity is employed. The workflow involves data processing, model training, and evolutionary design to iteratively improve molecular designs.
 The first step in this approach involves processing the initial dataset, which is comprised of SMILES representations and corresponding scores. The SMILES strings are converted to RDKit 2D descriptors using the MolConvert module. To predict the activity of molecules, various machine learning models such as RandomForest, SVR, and XGBoost are used to serve as oracles for evaluating the activity of newly generated molecules. The dataset is split into training and testing sets to evaluate model performance and trained models are evaluated on the testing set to assess their predictive accuracy based on metrics such as mean absolute error and R-squared.
