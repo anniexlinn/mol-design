@@ -25,7 +25,7 @@ An end-to-end pipeline for designing novel pharmaceutical molecules using:
 
 ---
 
-## 🔧 Installation  
+## Installation  
 
 ### Prerequisites  
 - Python 3.8+  
